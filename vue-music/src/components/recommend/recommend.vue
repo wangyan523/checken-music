@@ -1,21 +1,24 @@
 <template>
     <div class="recommend">
-    <div class="recommend-content">
+    <scroll ref="scroll" class="recommend-content" :data="discList">
+      <div>
         <div v-if="recommend.length" class="slider-wrapper">
-          <slider>
-            <div v-for="item in recommend" :key="item.id">
-              <a :href="item.linkUrl">
-                <img :src="item.picUrl">
-              </a>
-            </div>
-          </slider>
+          <div class="slider-content">
+            <slider ref="slider">
+              <div v-for="item in recommend" :key="item.id">
+                <a :href="item.linkUrl">
+                  <img @load="imgLoaded" :src="item.picUrl">
+                </a>
+              </div>
+            </slider>
+          </div>
         </div>
         <div class="recommend-list">
             <h1 class="list-title">热门歌单推荐</h1>
             <ul>
               <li v-for="item in discList" :key="item.dissid" class="item">
                 <div class="icon">
-                  <img width="60" height="60" :src="item.imgurl">
+                  <img width="60" height="60" v-lazy="item.imgurl">
                 </div>
                 <div class="text">
                   <h2 class="name" v-html="item.creator.name"></h2>
@@ -24,11 +27,13 @@
               </li>
             </ul>
         </div>
-    </div>
+      </div>
+    </scroll>
   </div>
 </template>
 
 <script>
+import Scroll from 'base/scroll/scroll.vue'
 import Slider from 'base/slider/slider.vue'
 import {getrecommend, getDiscList} from 'api/recommend'
 import {ERR_OK} from 'api/config'
@@ -41,7 +46,8 @@ export default {
     }
   },
   components: {
-    Slider
+    Slider,
+    Scroll
   },
   created() {
     this._getRecommend()
@@ -63,13 +69,19 @@ export default {
           this.discList = res.data.list
         }
       })
+    },
+    imgLoaded() {
+      if (!this.checked) {
+        this.scroll.refresh()
+        this.checked = true
+      }
     }
   }
 }
 </script>
 
-<style lang="stylus" scoped>
-@import "~common/stylus/variable"
+<style scoped lang="stylus" rel="stylesheet/stylus">
+  @import "~common/stylus/variable"
 
   .recommend
     position: fixed
@@ -83,8 +95,8 @@ export default {
         position: relative
         width: 100%
         height: 0
-        // padding-top: 40%
-        // overflow: hidden
+        padding-top: 40%
+        overflow: hidden
         .slider-content
           position: absolute
           top: 0
@@ -92,7 +104,6 @@ export default {
           width: 100%
           height: 100%
       .recommend-list
-        margin-top 40%
         .list-title
           height: 65px
           line-height: 65px
