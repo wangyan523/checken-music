@@ -26,6 +26,9 @@
                 </div>
               </li>
             </ul>
+            <div class="wrap" v-if="!discList.length">
+              <loading></loading>
+            </div>
         </div>
       </div>
     </scroll>
@@ -35,6 +38,7 @@
 <script>
 import Scroll from 'base/scroll/scroll.vue'
 import Slider from 'base/slider/slider.vue'
+import Loading from 'base/loading/loading.vue'
 import {getrecommend, getDiscList} from 'api/recommend'
 import {ERR_OK} from 'api/config'
 export default {
@@ -47,7 +51,8 @@ export default {
   },
   components: {
     Slider,
-    Scroll
+    Scroll,
+    Loading
   },
   created() {
     this._getRecommend()
@@ -104,6 +109,8 @@ export default {
           width: 100%
           height: 100%
       .recommend-list
+        .wrap 
+          margin-top 100px
         .list-title
           height: 65px
           line-height: 65px
