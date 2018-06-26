@@ -1,7 +1,13 @@
 <template>
-  <scroll class="listview" :data="data">
+  <scroll 
+    class="listview" 
+    :data="data" 
+    ref="listview" 
+    :listenScroll="listenScroll"
+    @scroll="scroll"
+  >
     <ul>
-      <li v-for="group in data" :key="group.id" class="list-group">
+      <li v-for="group in data" :key="group.id" class="list-group" ref="listgroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
           <li v-for="item in group.items" :key="item.id" class="list-group-item">
@@ -11,7 +17,7 @@
         </ul>
       </li>
     </ul>
-    <div class="list-shortcut" @touchstart="onshortcutTouchStrart">
+    <div class="list-shortcut" @touchstart="onshortcutTouchStrart" @touchmove.stop.prevent="onshortcutTouchSMove">
       <ul>
         <li 
           v-for="(item, index) in shortcutList" 
@@ -28,10 +34,24 @@
 
 <script>
 import Scroll from 'base/scroll/scroll.vue'
+import {getData} from 'common/js/dom.js'
+
+const ALPHABET_HEIGHT = 18
+
 export default {
   name: 'ListView',
+  created() {
+    this.touch = {}
+    this.listenScroll = true
+  },
   components: {
     Scroll
+  },
+  data() {
+    return {
+      scrollY: -1,
+      currentIndex: 0
+    }
   },
   props: {
     data: {
@@ -48,7 +68,24 @@ export default {
   },
   methods: {
     onshortcutTouchStrart(e) {
-
+      let alphabetIndex = getData(e.target, 'index')
+      let firstTouch = e.touches[0]
+      this.touch.alphabetIndex = alphabetIndex
+      this.touch.y1 = firstTouch.pageY
+      this._scrollto(alphabetIndex)
+    },
+    onshortcutTouchSMove(e) {
+      let firstTouch = e.touches[0]
+      this.touch.y2 = firstTouch.pageY
+      let alIndex = (this.touch.y2 - this.touch.y1) / ALPHABET_HEIGHT | 0
+      let exIndex = alIndex + this.touch.alphabetIndex * 1
+      this._scrollto(exIndex)
+    },
+    scroll(pos) {
+      this.scrollY = pos.y
+    },
+    _scrollto(index) {
+      this.$refs.listview.scrollToElement(this.$refs.listgroup[index])
     }
   }
 }
