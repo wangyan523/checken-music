@@ -63,7 +63,7 @@ export default {
   props: {
     data: {
       type: Array,
-      default: []
+      default: [1]
     }
   },
   computed: {
