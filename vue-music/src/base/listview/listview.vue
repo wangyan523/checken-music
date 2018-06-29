@@ -63,7 +63,7 @@ export default {
   props: {
     data: {
       type: Array,
-      default: [1]
+      default: []
     }
   },
   computed: {
@@ -142,7 +142,11 @@ export default {
         }
       }
       this.currentIndex = listHeight.length - 2
+    },
+    diff(newVal) {
+
     }
+
   }
 }
 </script>
