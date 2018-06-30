@@ -31,8 +31,11 @@
         </li>
       </ul>
     </div>
-    <div class="list-fixed" v-show="fixedTitle">
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
       <h1 class="fixed-title">{{fixedTitle}}</h1>
+    </div>
+    <div v-show="!data.length" class="loading-container">
+      <loading></loading>
     </div>
   </scroll>
 </template>
@@ -40,8 +43,10 @@
 <script>
 import Scroll from 'base/scroll/scroll.vue'
 import {getData} from 'common/js/dom.js'
+import Loading from 'base/loading/loading.vue'
 
 const ALPHABET_HEIGHT = 18
+const TITLE_HEIGHT = 30
 
 export default {
   name: 'ListView',
@@ -49,15 +54,17 @@ export default {
     this.touch = {}
     this.listenScroll = true
     this.listHeight = []
+    this.probeType = 3
   },
   components: {
-    Scroll
+    Scroll,
+    Loading
   },
   data() {
     return {
       scrollY: -1,
       currentIndex: 0,
-      probeType: 3
+      diff: -1
     }
   },
   props: {
@@ -109,10 +116,10 @@ export default {
       }
     },
     _scrollto(index) {
-      if (!index && index!==0) {
+      if (!index && index !== 0) {
         return
       }
-      if (index <0) {
+      if (index < 0) {
         index = 0
       } else if (index > this.listHeight.length - 2) {
         index = this.listHeight.length - 2
@@ -138,13 +145,19 @@ export default {
         let height2 = listHeight[i + 1]
         if (-newY >= height1 && -newY < height2) {
           this.currentIndex = i
+          this.diff = height2 + newY
           return
         }
       }
       this.currentIndex = listHeight.length - 2
     },
     diff(newVal) {
-
+      let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
+      if (this.fixedTop === fixedTop) {
+        return
+      }
+      this.fixedTop = fixedTop
+      this.$refs.fixed.style.transform = `translate3d(0, ${fixedTop}px, 0)`
     }
 
   }
