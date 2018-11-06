@@ -4,7 +4,7 @@
       <slot>
       </slot>
     </div>
-    <div class="dots">
+    <div class="dot">
       <span class="dot" 
         v-for="(item,i) in dots" 
         :key="i"
