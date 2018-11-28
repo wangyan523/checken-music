@@ -1,6 +1,6 @@
 <template>
   <span class="demo" v-show="isShow">
-    this is a span
+    this is a spans
   </span>
 </template>
 
